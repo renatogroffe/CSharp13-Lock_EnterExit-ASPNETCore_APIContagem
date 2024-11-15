@@ -7,7 +7,7 @@ namespace APIContagem.Controllers;
 [Route("[controller]")]
 public class ContadorController : ControllerBase
 {
-    private static Lock _ContagemLock = new();
+    private readonly static Lock ContagemLock = new();
 
     private readonly ILogger<ContadorController> _logger;
     private readonly IConfiguration _configuration;
@@ -22,10 +22,11 @@ public class ContadorController : ControllerBase
         _contador = contador;
     }
 
+    [HttpGet]
     public ResultadoContador Get()
     {
         int valorAtualContador;
-        _ContagemLock.Enter();
+        ContagemLock.Enter();
         try
         {
             _contador.Incrementar();
@@ -33,7 +34,7 @@ public class ContadorController : ControllerBase
         }
         finally
         {
-            _ContagemLock.Exit();
+            ContagemLock.Exit();
         }
         _logger.LogInformation($"Contador - Valor atual: {valorAtualContador}");
 
